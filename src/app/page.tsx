@@ -1,65 +1,128 @@
-import Image from "next/image";
+import CartDrawer from "@/components/CartDrawer";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import MenuGrid from "@/components/MenuGrid";
+// 1. We import signIn, signOut, and auth from our new auth.ts file
+import { signIn, auth } from "@/auth";
+import Link from "next/link"; 
+import { ClipboardList, LogOut } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
-export default function Home() {
+// 2. We add 'async' here because fetching the session takes time
+export default async function Home() {
+  // 3. We ask Auth.js: "Is anyone currently logged in?"
+  const session = await auth();
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="min-h-screen bg-[#FDFCF8] text-slate-900 pb-24">
+      {/* Navbar */}
+      <header className="p-4 sm:p-6 flex justify-between items-center max-w-7xl mx-auto">
+        <h1 className="text-xl sm:text-2xl font-black tracking-tighter">CampusKlub.</h1>
+        
+        <div className="flex items-center gap-2 sm:gap-4">
+          <CartDrawer />
+
+          {session ? (
+            <>
+              {/* --- MOBILE VIEW (Icons Only) --- */}
+              <div className="flex sm:hidden items-center gap-1">
+                <Link href="/orders">
+                  <Button variant="ghost" size="icon" className="rounded-full text-slate-500 hover:text-slate-900">
+                    <ClipboardList className="w-5 h-5" />
+                  </Button>
+                </Link>
+                <form action={async () => {
+                  "use server";
+                  const { signOut } = await import("@/auth");
+                  await signOut();
+                }}>
+                  <Button variant="ghost" size="icon" className="rounded-full text-slate-500 hover:text-red-600">
+                    <LogOut className="w-5 h-5" />
+                  </Button>
+                </form>
+              </div>
+
+              {/* --- DESKTOP VIEW (Full Text) --- */}
+              <div className="hidden sm:flex items-center gap-4">
+                 <span className="font-medium text-sm">Hi, {session.user?.name?.split(" ")[0]}</span>
+                 
+                 <Link href="/orders">
+                   <Button variant="ghost" className="rounded-full font-semibold text-slate-500 hover:text-slate-900">
+                     My Orders
+                   </Button>
+                 </Link>
+
+                 <form action={async () => {
+                   "use server";
+                   const { signOut } = await import("@/auth");
+                   await signOut();
+                 }}>
+                   <Button variant="outline" className="rounded-full font-semibold">Logout</Button>
+                 </form>
+              </div>
+            </>
+          ) : (
+            <form action={async () => {
+                "use server";
+                const { signIn } = await import("@/auth");
+                await signIn("google", { redirectTo: "/dashboard" });
+              }}>
+              <Button type="submit" variant="ghost" className="rounded-full font-semibold">
+                Vendor Login
+              </Button>
+            </form>
+          )}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </header>
+
+      {/* Hero Section */}
+      <main className="max-w-7xl mx-auto px-6 py-20 md:py-32 flex flex-col items-center text-center">
+        <Badge className="mb-6 bg-amber-100 text-amber-700 hover:bg-amber-100 border-0 px-4 py-1 text-sm rounded-full">
+          🚀 The #1 Campus Food App
+        </Badge>
+        
+        <h2 className="text-5xl md:text-7xl font-black tracking-tighter mb-6 leading-tight max-w-4xl">
+          Skip the line. <br className="hidden md:block"/>
+          Get your favorite campus meals <span className="text-[#FFD100]">faster.</span>
+        </h2>
+        
+        <p className="text-lg md:text-xl text-slate-500 mb-10 max-w-2xl">
+          Order fresh food from top student vendors, track your meal in real-time, and pick it up the second it's ready.
+        </p>
+        
+        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+          {/* If they are NOT logged in, show the Student Login button */}
+          {!session ? (
+            <form action={async () => {
+              "use server";
+              const { signIn } = await import("@/auth");
+              // Students stay on the homepage to browse food!
+              await signIn("google", { redirectTo: "/" });
+            }} className="w-full sm:w-auto">
+              <Button type="submit" size="lg" className="w-full bg-slate-900 text-white hover:bg-slate-800 rounded-full h-14 px-8 text-lg font-bold">
+                Log in to Order
+              </Button>
+            </form>
+          ) : (
+            /* If they ARE logged in, let them go to the menu */
+            <Link href="/menu" className="w-full sm:w-auto">
+              <Button size="lg" className="w-full bg-[#FFD100] text-black hover:bg-[#E6BC00] rounded-full h-14 px-8 text-lg font-bold">
+                Browse Menu
+              </Button>
+            </Link>
+          )}
+
+          {/* If they are logged in AND they are a vendor (or want to be), give them dashboard access */}
+          {session && (
+            <Link href="/dashboard" className="w-full sm:w-auto">
+              <Button size="lg" variant="outline" className="w-full rounded-full h-14 px-8 text-lg font-bold border-2">
+                Vendor Dashboard
+              </Button>
+            </Link>
+          )}
         </div>
       </main>
-    </div>
+
+    </main>
   );
 }
