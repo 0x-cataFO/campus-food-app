@@ -48,6 +48,7 @@ export async function addFoodItem(formData: FormData) {
   });
 
   revalidatePath("/dashboard");
+  revalidatePath("/menu");
 }
 
 // 2. Function to Update Order Status (The one that was missing!)
@@ -63,6 +64,7 @@ export async function updateOrderStatus(orderId: string, newStatus: "PENDING" | 
 
   // Refresh the dashboard to show the new status instantly
   revalidatePath("/dashboard");
+  revalidatePath("/menu");
 }
 
 // src/app/dashboard/actions.ts
@@ -89,6 +91,7 @@ export async function toggleFoodAvailability(itemId: string) {
       data: { isAvailable: !item.isAvailable }
     });
     revalidatePath("/dashboard");
+    revalidatePath("/menu");
   }
 }
 
@@ -127,6 +130,7 @@ export async function deleteFoodItem(itemId: string) {
   }
 
   revalidatePath("/dashboard");
+  revalidatePath("/menu");
 }
 
 // Add this at the bottom of src/app/dashboard/actions.ts
@@ -161,6 +165,7 @@ export async function updateFoodItem(itemId: string, formData: FormData) {
   });
 
   revalidatePath("/dashboard");
+  revalidatePath("/menu");
 }
 
 // Add this at the bottom of src/app/dashboard/actions.ts
@@ -184,4 +189,5 @@ export async function toggleStoreStatus() {
 
   // 3. Refresh the page
   revalidatePath("/dashboard");
+  revalidatePath("/menu");
 }

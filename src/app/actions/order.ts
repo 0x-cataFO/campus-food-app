@@ -49,6 +49,7 @@ export async function processSuccessfulPayment(cartItems: CartItem[], paymentRef
 
     revalidatePath("/profile");
     revalidatePath("/dashboard");
+    // revalidatePath("/menu");
     
     return { success: true };
   } catch (error) {
