@@ -128,3 +128,60 @@ export async function deleteFoodItem(itemId: string) {
 
   revalidatePath("/dashboard");
 }
+
+// Add this at the bottom of src/app/dashboard/actions.ts
+
+export async function updateFoodItem(itemId: string, formData: FormData) {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Unauthorized");
+
+  const vendor = await prisma.vendorProfile.findUnique({
+    where: { userId: session.user.id }
+  });
+
+  if (!vendor) throw new Error("Not authorized");
+
+  const name = formData.get("name") as string;
+  const description = formData.get("description") as string;
+  const price = parseFloat(formData.get("price") as string);
+  const uploadedImage = formData.get("imageUrl") as string;
+
+  // Build the update data object
+  const updateData: any = { name, description, price };
+  
+  // Only update the image if a new one was uploaded
+  if (uploadedImage) {
+    updateData.imageUrl = uploadedImage;
+  }
+
+  // Save to database
+  await prisma.foodItem.update({
+    where: { id: itemId, vendorId: vendor.id },
+    data: updateData
+  });
+
+  revalidatePath("/dashboard");
+}
+
+// Add this at the bottom of src/app/dashboard/actions.ts
+
+export async function toggleStoreStatus() {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Unauthorized");
+
+  // 1. Find the vendor
+  const vendor = await prisma.vendorProfile.findUnique({
+    where: { userId: session.user.id }
+  });
+
+  if (!vendor) throw new Error("Not authorized");
+
+  // 2. Flip the isOpen boolean in the database
+  await prisma.vendorProfile.update({
+    where: { id: vendor.id },
+    data: { isOpen: !vendor.isOpen }
+  });
+
+  // 3. Refresh the page
+  revalidatePath("/dashboard");
+}

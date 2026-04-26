@@ -1,33 +1,32 @@
+// src/store/useCartStore.ts
 import { create } from 'zustand';
+import { FoodItemWithVendor } from '@/components/AddToCartButton';
 
-// Define the shape of a Cart Item
-export interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  imageUrl: string;
-  vendorId: string;
+// 1. We extend our new dynamic type, adding 'quantity' to it
+export interface CartItem extends FoodItemWithVendor {
   quantity: number;
 }
 
-// Define the shape of our entire Store
-interface CartStore {
+// 2. Define the shape of our Store
+interface CartState {
   items: CartItem[];
-  addItem: (item: Omit<CartItem, 'quantity'>) => void;
-  removeItem: (id: string) => void;
+  addItem: (item: FoodItemWithVendor) => void;
+  removeItem: (itemId: string) => void;
   clearCart: () => void;
-  getTotal: () => number;
+  
+  // THE FIX: Re-adding the missing helper functions!
   getItemCount: () => number;
+  getTotalPrice: () => number;
 }
 
-// Create the Zustand Store
-export const useCartStore = create<CartStore>((set, get) => ({
+// 3. Build the actual Zustand Store
+export const useCartStore = create<CartState>((set, get) => ({
   items: [],
   
-  // Adds an item or increases its quantity if it's already in the cart
-  addItem: (item) => {
+  addItem: (item) => 
     set((state) => {
       const existingItem = state.items.find((i) => i.id === item.id);
+      
       if (existingItem) {
         return {
           items: state.items.map((i) =>
@@ -36,22 +35,24 @@ export const useCartStore = create<CartStore>((set, get) => ({
         };
       }
       return { items: [...state.items, { ...item, quantity: 1 }] };
-    });
-  },
-  
-  // Completely removes an item
-  removeItem: (id) => {
+    }),
+
+  removeItem: (itemId) =>
     set((state) => ({
-      items: state.items.filter((i) => i.id !== id),
-    }));
-  },
-  
-  // Wipes the cart clean (used after checkout)
+      items: state.items.filter((i) => i.id !== itemId),
+    })),
+
   clearCart: () => set({ items: [] }),
-  
-  // Calculates the total price in Naira
-  getTotal: () => get().items.reduce((total, item) => total + (item.price * item.quantity), 0),
-  
-  // Calculates how many total items are in the cart
-  getItemCount: () => get().items.reduce((count, item) => count + item.quantity, 0),
+
+  // THE FIX: The logic to calculate totals
+  getItemCount: () => {
+    // get() lets us look at the current items in the store
+    const { items } = get();
+    return items.reduce((total, item) => total + item.quantity, 0);
+  },
+
+  getTotalPrice: () => {
+    const { items } = get();
+    return items.reduce((total, item) => total + (item.price * item.quantity), 0);
+  }
 }));

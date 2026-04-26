@@ -5,7 +5,7 @@ import MenuGrid from "@/components/MenuGrid";
 // 1. We import signIn, signOut, and auth from our new auth.ts file
 import { signIn, auth } from "@/auth";
 import Link from "next/link"; 
-import { ClipboardList, LogOut } from "lucide-react";
+import { ClipboardList, LogOut, User } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 // 2. We add 'async' here because fetching the session takes time
@@ -24,6 +24,13 @@ export default async function Home() {
 
           {session ? (
             <>
+              {/* NEW: The Profile Button */}
+              <Button variant="ghost" size="icon" asChild className="rounded-full bg-slate-100 hover:bg-slate-200">
+                <Link href="/profile">
+                  <User className="w-5 h-5 text-slate-700" />
+                </Link>
+              </Button>
+              
               {/* --- MOBILE VIEW (Icons Only) --- */}
               <div className="flex sm:hidden items-center gap-1">
                 <Link href="/orders">

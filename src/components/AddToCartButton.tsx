@@ -2,36 +2,37 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useCartStore } from "@/store/useCartStore"; // Adjust this import path if your store is somewhere else!
 import { ShoppingCart } from "lucide-react";
-import { useCartStore } from "@/store/useCartStore";
 
-// We pass the required food details in as props
-interface AddToCartButtonProps {
-  food: {
+export type FoodItemWithVendor = {
+  id: string;
+  name: string;
+  description: string | null;
+  price: number;
+  imageUrl: string | null;
+  vendorId: string;
+  isAvailable: boolean;
+  vendor: {
     id: string;
-    name: string;
-    price: number;
-    imageUrl: string;
-    vendorId: string;
-  }
-}
+    userId: string;
+    storeName: string;
+    location: string;
+    isOpen: boolean;
+  };
+};
 
-export default function AddToCartButton({ food }: AddToCartButtonProps) {
-  // Pull the addItem function from our Zustand store
+export default function AddToCartButton({ item }: { item: FoodItemWithVendor }) {
+  // Grab the addItem function from your Zustand store
   const addItem = useCartStore((state) => state.addItem);
 
   return (
     <Button 
-      onClick={() => addItem({
-        id: food.id,
-        name: food.name,
-        price: food.price,
-        imageUrl: food.imageUrl,
-        vendorId: food.vendorId
-      })}
-      className="rounded-full px-6 bg-slate-900 text-white hover:bg-slate-800 flex items-center gap-2 transition-transform active:scale-95"
+      onClick={() => addItem(item)}
+      className="w-full bg-[#FFD100] text-black hover:bg-[#E6BC00] rounded-full font-bold transition-transform active:scale-95"
     >
-      <ShoppingCart className="w-4 h-4" /> Add
+      <ShoppingCart className="w-4 h-4 mr-2" />
+      Add to Cart
     </Button>
   );
 }
