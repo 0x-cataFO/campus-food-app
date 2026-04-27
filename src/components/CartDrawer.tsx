@@ -7,6 +7,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescri
 import { Button } from "@/components/ui/button";
 import { ShoppingBag, Trash2 } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
+import { useRouter } from "next/navigation"; // 👈 Added Router for redirect
+import { useSession } from "next-auth/react"; // 👈 Added NextAuth hook
 
 // Dynamically import the CheckoutButton to prevent server crashes
 const CheckoutButton = dynamic(() => import("./CheckoutButton"), { 
@@ -19,11 +21,18 @@ export default function CartDrawer() {
   const items = useCartStore((state) => state.items);
   const removeItem = useCartStore((state) => state.removeItem);
   const itemCount = useCartStore((state) => state.getItemCount());
+  
+  // 👈 Initialize our hooks
+  const router = useRouter();
+  const { data: session } = useSession(); 
 
   const cartTotal = items.reduce((total, item) => total + (item.price * item.quantity), 0);
 
+  // 👈 Check if they have a phone, and grab their actual email!
+  const hasPhone = !!session?.user?.phone;
+  const userEmail = session?.user?.email || "student@campusklub.com";
+
   return (
-    // THE MAGIC FIX: modal={false} tells Shadcn NOT to lock the background screen!
     <Sheet open={isOpen} onOpenChange={setIsOpen} modal={false}>
       <SheetTrigger asChild>
         <Button variant="outline" className="relative rounded-full font-semibold px-5 h-10 border-slate-200 hover:bg-slate-50">
@@ -91,10 +100,25 @@ export default function CartDrawer() {
           </div>
           
           {items.length > 0 && (
-            <CheckoutButton 
-              email="student@campusklub.com" 
-              closeCart={() => setIsOpen(false)} 
-            />
+            hasPhone ? (
+              /* REAL BUTTON: Opens Paystack because they have a phone number */
+              <CheckoutButton 
+                email={userEmail} 
+                closeCart={() => setIsOpen(false)} 
+              />
+            ) : (
+              /* FAKE BUTTON: Triggers the alert and redirects to profile */
+              <Button 
+                onClick={() => {
+                  alert("⚠️ Action Required: Please set up your phone number in your Profile so vendors can call you when your food is ready!");
+                  setIsOpen(false); // Close the cart drawer
+                  router.push("/profile"); // Send them to the profile page
+                }} 
+                className="w-full h-14 text-lg font-bold bg-[#FFD100] text-black hover:bg-[#E6BC00] rounded-2xl transition-colors shadow-sm"
+              >
+                Proceed to Checkout
+              </Button>
+            )
           )}
         </div>
       </SheetContent>

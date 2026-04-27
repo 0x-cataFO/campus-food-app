@@ -4,20 +4,25 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import CartDrawer from "@/components/CartDrawer";
 
 export default function MenuPage() {
   return (
     <main className="min-h-screen bg-slate-50 pt-8 pb-24">
       <div className="max-w-7xl mx-auto px-6">
         
-        {/* NEW: The Back Button */}
-        <div className="mb-6">
-          <Button variant="ghost" asChild className="pl-0 hover:bg-transparent hover:text-[#FFD100] transition-colors">
+        {/* THE FIX: We use flexbox to push the Back button left and Cart right */}
+        <div className="flex justify-between items-center mb-6">
+          {/* The Back Button */}
+          <Button variant="ghost" asChild className="pl-0 hover:bg-transparent hover:text-orange-500 transition-colors">
             <Link href="/">
               <ArrowLeft className="w-5 h-5 mr-2" />
               Back to Home
             </Link>
           </Button>
+
+          {/* NEW: The Cart Drawer dropped right here! */}
+          <CartDrawer />
         </div>
 
         <div className="mb-10 text-center">

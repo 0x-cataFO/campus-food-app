@@ -7,7 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Package, ShoppingBag, DollarSign, LogOut, Edit, Trash, Menu, Store, Pause, Play, History, CheckCircle } from "lucide-react";
+// ADDED ArrowLeft HERE!
+import { Package, ShoppingBag, DollarSign, LogOut, Edit, Trash, Menu, Store, Pause, Play, History, CheckCircle, ArrowLeft } from "lucide-react";
 import AddFoodModal from "@/components/AddFoodModal";
 import EditFoodModal from "@/components/EditFoodModal";
 import Link from "next/link";
@@ -34,7 +35,7 @@ export default async function DashboardPage() {
     where: { userId: session.user.id },
     include: {
       foodItems: { 
-        where: { isArchived: false }, // ✅ THE FIX: Force the DB to hide it!
+        where: { isArchived: false },
         orderBy: { createdAt: 'desc' } 
       },
       orders: {
@@ -61,13 +62,11 @@ export default async function DashboardPage() {
   }
 
   // Data helpers
-  // Filter out archived items so they disappear from the vendor's view!
-  const menuItems = vendor.foodItems || []; // No more JS filter needed!
+  const menuItems = vendor.foodItems || [];
   const activeOrders = vendor.orders?.filter((order) => order.status !== "COMPLETED" && order.status !== "CANCELLED") || [];
   const completedOrders = vendor.orders?.filter((order) => order.status === "COMPLETED") || [];
   
   const pendingOrdersCount = activeOrders.filter((order) => order.status === "PENDING").length || 0;
-  // Calculate total revenue ONLY from completed orders!
   const totalRevenue = completedOrders.reduce((sum, order) => sum + order.totalAmount, 0) || 0;
 
   return (
@@ -86,6 +85,12 @@ export default async function DashboardPage() {
               <SheetDescription className="sr-only">Dashboard navigation</SheetDescription>
             </SheetHeader>
             <nav className="space-y-2 flex-1">
+              {/* THE MOBILE BACK BUTTON */}
+              <Link href="/">
+                <Button variant="ghost" className="w-full justify-start gap-2 text-slate-500 hover:text-slate-900 mb-2">
+                  <ArrowLeft className="w-4 h-4" /> Back to Home
+                </Button>
+              </Link>
               <Button variant="secondary" className="w-full justify-start gap-2">
                 <Store className="w-4 h-4" /> My Store
               </Button>
@@ -110,6 +115,12 @@ export default async function DashboardPage() {
         <div>
           <h2 className="text-xl font-black tracking-tighter mb-6">CampusKlub.</h2>
           <nav className="space-y-2">
+            {/* THE DESKTOP BACK BUTTON */}
+            <Link href="/">
+              <Button variant="ghost" className="w-full justify-start gap-2 text-slate-500 hover:text-slate-900 mb-2">
+                <ArrowLeft className="w-4 h-4" /> Back to Home
+              </Button>
+            </Link>
             <Button variant="secondary" className="w-full justify-start gap-2">
               <Store className="w-4 h-4" /> My Store
             </Button>

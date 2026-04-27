@@ -15,6 +15,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.role = user.role; 
         // @ts-ignore
         session.user.id = user.id;
+        session.user.phone = (user as any).phone;
       }
       return session;
     }

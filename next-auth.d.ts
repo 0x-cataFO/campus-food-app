@@ -8,11 +8,13 @@ declare module "next-auth" {
   interface Session {
     user: {
       id: string;
-      role: string; // 👈 This is the magic line that fixes your error!
+      role: string; // 
+      phone?: string | null;
     } & DefaultSession["user"];
   }
 
   interface User {
     role: string;
+    phone?: string | null; 
   }
 }
