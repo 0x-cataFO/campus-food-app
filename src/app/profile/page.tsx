@@ -1,13 +1,14 @@
+// src/app/profile/page.tsx
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { ArrowLeft, Phone, User as UserIcon, Wallet, Save } from "lucide-react";
+import { ArrowLeft, User as UserIcon, Wallet } from "lucide-react";
 import Link from "next/link";
-import { updateProfile } from "./actions";
+
+// 👇 IMPORT THE NEW CLIENT FORM WE CREATED
+import ProfileForm from "./ProfileForm"; 
 
 export default async function ProfilePage() {
   const session = await auth();
@@ -77,38 +78,10 @@ export default async function ProfilePage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {/* Point to our new updateProfile action */}
-              <form action={updateProfile} className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Full Name</Label>
-                    <Input 
-                      id="name" 
-                      name="name" 
-                      defaultValue={user.name || ""} 
-                      required 
-                      className="bg-slate-50"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number</Label>
-                    <Input 
-                      id="phone" 
-                      name="phone" 
-                      type="tel" 
-                      placeholder="e.g. 08012345678" 
-                      defaultValue={user.phone || ""} 
-                      required 
-                      className="bg-slate-50"
-                    />
-                  </div>
-                </div>
-                <div className="flex justify-end pt-4">
-                  <Button type="submit" className="px-8 bg-black text-white hover:bg-slate-800 font-bold">
-                    <Save className="w-4 h-4 mr-2" /> Save Profile
-                  </Button>
-                </div>
-              </form>
+              
+              {/* THE MAGIC FIX: We drop in the Client Component Form here! */}
+              <ProfileForm user={user} />
+
             </CardContent>
           </Card>
 
