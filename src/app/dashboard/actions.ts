@@ -117,18 +117,22 @@ export async function deleteFoodItem(itemId: string) {
   } catch (error: any) {
     // 2. If Prisma throws P2003 (Foreign Key Constraint Failed)
     if (error.code === 'P2003') {
-      console.log("Cannot hard-delete item with order history. Soft deleting instead.");
+      console.log("Cannot hard-delete item with order history. Archiving instead.");
       
-      // We safely "soft delete" it by marking it unavailable
+      // THE FIX: We archive it AND pause it!
       await prisma.foodItem.update({
         where: { id: itemId, vendorId: vendor.id },
-        data: { isAvailable: false }
+        data: { 
+          isAvailable: false,
+          isArchived: true // This hides it forever!
+        }
       });
     } else {
-      throw error; // If it's a different error, let it crash normally
+      throw error; 
     }
   }
 
+  // Refresh both the dashboard and the student menu
   revalidatePath("/dashboard");
   revalidatePath("/menu");
 }

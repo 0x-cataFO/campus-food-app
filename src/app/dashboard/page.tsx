@@ -33,9 +33,12 @@ export default async function DashboardPage() {
   const vendor = await prisma.vendorProfile.findUnique({
     where: { userId: session.user.id },
     include: {
-      foodItems: { orderBy: { createdAt: 'desc' } },
+      foodItems: { 
+        where: { isArchived: false }, // ✅ THE FIX: Force the DB to hide it!
+        orderBy: { createdAt: 'desc' } 
+      },
       orders: {
-        orderBy: { createdAt: 'desc' }, // Switched to descending so newest orders are on top!
+        orderBy: { createdAt: 'desc' },
         include: {
           student: true,
           items: { include: { foodItem: true } }
@@ -58,7 +61,8 @@ export default async function DashboardPage() {
   }
 
   // Data helpers
-  const menuItems = vendor.foodItems || [];
+  // Filter out archived items so they disappear from the vendor's view!
+  const menuItems = vendor.foodItems || []; // No more JS filter needed!
   const activeOrders = vendor.orders?.filter((order) => order.status !== "COMPLETED" && order.status !== "CANCELLED") || [];
   const completedOrders = vendor.orders?.filter((order) => order.status === "COMPLETED") || [];
   

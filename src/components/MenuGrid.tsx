@@ -8,6 +8,7 @@ export default async function MenuGrid() {
   // THE FIX: Strict filtering for Active Food AND Open Stores
   const items = await prisma.foodItem.findMany({
     where: {
+      isArchived: false, // 👈 Ensures students never see deleted/archived food
       isAvailable: true,         // 1. The food item itself must not be paused
       vendor: {
         isOpen: true             // 2. The vendor's master switch must be OPEN

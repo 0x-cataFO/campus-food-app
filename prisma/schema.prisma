@@ -104,6 +104,7 @@ model FoodItem {
   price           Float         
   imageUrl        String?
   isAvailable     Boolean       @default(true)
+  isArchived      Boolean       @default(false)
   
   orderItems      OrderItem[]
   createdAt       DateTime      @default(now())
